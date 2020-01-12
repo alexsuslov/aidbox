@@ -32,9 +32,14 @@ func Request(method string, url *url.URL, reader io.ReadCloser, contentType stri
 			fmt.Sprintf("%v:%v", _client, _secret),
 			),
 		)
+	Print("Basic", basic)
 	authorization := fmt.Sprintf("Basic %v", basic)
+	Print("Authorization", basic)
 	req.Header.Set("Authorization", authorization)
 	req.Header.Set("Content-Type", contentType)
+	req.Header.Set("accept", contentType)
+
+	Print("Content", contentType)
 
 	client := &http.Client{Transport: tr}
 	r, err := client.Do(req)

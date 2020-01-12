@@ -1,0 +1,10 @@
+resourceType: Patient
+name:
+- given: [Max1]
+  family: Turikov1
+gender: male
+birthDate: '1990-10-10'
+address:
+- line:
+  - 123 Oxygen St
+  city: Hello1

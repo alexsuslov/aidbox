@@ -1,8 +1,9 @@
 package api
 
 import (
+	"fmt"
+	"io"
 	"net/url"
-	"path"
 )
 
 type ReadOptions struct {
@@ -16,7 +17,7 @@ func NewReadOptions() *ReadOptions{
 }
 
 func Read(resource string, options *ReadOptions)(body io.ReadCloser, err error) {
-	Url := path.Join(_host, resource)
+	Url := fmt.Sprintf("%v/%v", _host, resource)
 	u, err := url.Parse(Url)
 	if err!= nil{
 		return
