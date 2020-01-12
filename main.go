@@ -12,7 +12,7 @@ import (
 )
 
 var version string
-var ver &bool
+var ver *bool
 var help string
 var debugger bool
 
@@ -67,7 +67,7 @@ func main(){
 		if !ok{
 			panic("Error Content-Type")
 		}
-		body, err := api.Read(read, api.ReadOptions{contentType:t})
+		body, err := api.Read(read, &api.ReadOptions{ContentType:t})
 		Done(body, err)
 		os.Exit(0)
 	}
@@ -79,7 +79,7 @@ func main(){
 			panic("Error Content-Type")
 		}
 		reader := bufio.NewReader(os.Stdin)
-		body, err := api.Create(create, ioutil.NopCloser(reader), &CreateOptions{ContentType:t})
+		body, err := api.Create(create, ioutil.NopCloser(reader), &api.CreateOptions{ContentType:t})
 		Done(body, err)
 		os.Exit(0)
 	}
