@@ -30,9 +30,9 @@ var contentType = map[string]string{
 
 func init() {
 	// debugger
-	flag.BoolVar(&debugger, "debugger", false, "enable debugger")
+	flag.BoolVar(&debugger, "debugger", false, "Enable debugger")
 	// Config
-	flag.StringVar(&config, "config", ".env", "gotrs config env")
+	flag.StringVar(&config, "config", ".env", "Config file")
 	// Create
 	flag.StringVar(&create, "create", "", "Create a new resource")
 	//GET
@@ -41,7 +41,7 @@ func init() {
 	// content type
 	flag.StringVar(&ctype, "ctype", "json", "Content Type json| xml| yml ")
 
-	ver = flag.Bool("version", false, "prints current roxy version")
+	ver = flag.Bool("version", false, "Print current version")
 
 	flag.Parse()
 }
@@ -83,8 +83,6 @@ func main(){
 		Done(body, err)
 		os.Exit(0)
 	}
-
-	fmt.Printf("GoOTRS is a Golang wrapper for accessing OTRS using the REST API. Version %v \n", version)
 
 }
 
