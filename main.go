@@ -18,7 +18,10 @@ var debugger bool
 
 var config string
 var create string
+var update string
 var read string
+var delete string
+
 var ctype string
 
 var contentType = map[string]string{
@@ -35,8 +38,13 @@ func init() {
 	flag.StringVar(&config, "config", ".env", "Config file")
 	// Create
 	flag.StringVar(&create, "create", "", "Create a new resource")
-	//GET
+	// Read
 	flag.StringVar(&read, "read", "", "Read the current state of the resource")
+	// update
+	flag.StringVar(&update, "update", "",
+		"Update an existing resource by its id (or create it if it is new)")
+	// Delete
+	flag.StringVar(&delete, "delete", "", "Delete a resource")
 
 	// content type
 	flag.StringVar(&ctype, "ctype", "json", "Content Type json| xml| yml ")
@@ -71,6 +79,17 @@ func main(){
 		Done(body, err)
 		os.Exit(0)
 	}
+	// Update
+	if update!= ""{
+		t, ok := contentType[ctype]
+		if !ok{
+			panic("Error Content-Type")
+		}
+		reader := bufio.NewReader(os.Stdin)
+		body, err := api.Update(read, ioutil.NopCloser(reader), &api.UpdateOptions{ContentType:t})
+		Done(body, err)
+		os.Exit(0)
+	}
 
 	// create
 	if create!= ""{
@@ -79,7 +98,22 @@ func main(){
 			panic("Error Content-Type")
 		}
 		reader := bufio.NewReader(os.Stdin)
-		body, err := api.Create(create, ioutil.NopCloser(reader), &api.CreateOptions{ContentType:t})
+		body, err := api.Create(create, ioutil.NopCloser(reader), &api.CreateOptions{
+			ContentType:t,
+		})
+		Done(body, err)
+		os.Exit(0)
+	}
+
+	// delete
+	if delete!= ""{
+		t, ok := contentType[ctype]
+		if !ok{
+			panic("Error Content-Type")
+		}
+		body, err := api.Delete(create, &api.DeleteOptions{
+			ContentType:t,
+		})
 		Done(body, err)
 		os.Exit(0)
 	}
