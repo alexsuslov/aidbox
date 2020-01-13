@@ -36,6 +36,8 @@ func init() {
 	flag.BoolVar(&debugger, "debugger", false, "Enable debugger")
 	// Config
 	flag.StringVar(&config, "config", ".env", "Config file")
+	// Help
+	flag.StringVar(&help, "help", "", "Help")
 	// Create
 	flag.StringVar(&create, "create", "", "Create a new resource")
 	// Read
@@ -68,7 +70,7 @@ func main(){
 	}
 
 	api.DEBUGGING=debugger
-
+	helper(help)
 	// read
 	if read!= ""{
 		t, ok := contentType[ctype]
