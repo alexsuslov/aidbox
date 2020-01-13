@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	. "github.com/logrusorgru/aurora"
 )
 
 func helper(help string){
@@ -10,23 +11,22 @@ func helper(help string){
 
 	case "read":
 		fmt.Printf("Aidbox %v \n----", version)
-		fmt.Println(helpReadText)
+		fmt.Printf(helpReadText, Green(exmRead), Green(exmVRead))
 	}
 	if help!=""{
 		os.Exit(0)
 	}
 }
 
-
-
 var helpReadText = `
 Reader used to obtain a resource by a given id.
 
-	aidbox -read /Patient/17b69d79-3d9b-45f8-af79-75f958502763
+  %v
 
 History used to obtain a resource by a given id and revision.
 
-	aidbox -read /Patient/17b69d79-3d9b-45f8-af79-75f958502763/_history/13
+  %v
 
 `
-
+var exmRead = `aidbox -read /Patient/17b69d79-3d9b-45f8-af79-75f958502763`
+var exmVRead = `aidbox -read /Patient/17b69d79-3d9b-45f8-af79-75f958502763/_history/13`
