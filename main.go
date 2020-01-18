@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/alexsuslov/aidbox/api"
-	"github.com/alexsuslov/godotenv"
 	"io"
 	"io/ioutil"
 	"os"
+
+	"github.com/alexsuslov/aidbox/api"
+	"github.com/alexsuslov/godotenv"
 )
 
 var version string
@@ -19,6 +20,8 @@ var debugger bool
 var config string
 var create string
 var update string
+var patch string
+
 var read string
 var delete string
 
@@ -26,8 +29,8 @@ var ctype string
 
 var contentType = map[string]string{
 	"json": "application/json",
-	"xml": "text/xml",
-	"yml": "text/yaml",
+	"xml":  "text/xml",
+	"yml":  "text/yaml",
 	"yaml": "text/yaml",
 }
 
@@ -45,6 +48,8 @@ func init() {
 	// update
 	flag.StringVar(&update, "update", "",
 		"Update an existing resource by its id (or create it if it is new)")
+	// Patch
+	flag.StringVar(&patch, "patch", "", "Patch part of your resource")
 	// Delete
 	flag.StringVar(&delete, "delete", "", "Delete a resource")
 
@@ -56,65 +61,77 @@ func init() {
 	flag.Parse()
 }
 
-func main(){
-	if err := godotenv.Load(config); err!= nil{
+func main() {
+	if err := godotenv.Load(config); err != nil {
 		panic(err)
 	}
 	if *ver {
-      fmt.Println(version)
-      os.Exit(0)
-    }
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
-	if err := api.Init(); err!= nil {
+	if err := api.Init(); err != nil {
 		panic(fmt.Errorf("Init:%v", err))
 	}
 
-	api.DEBUGGING=debugger
+	api.DEBUGGING = debugger
 	helper(help)
 	// read
-	if read!= ""{
+	if read != "" {
 		t, ok := contentType[ctype]
-		if !ok{
+		if !ok {
 			panic("Error Content-Type")
 		}
-		body, err := api.Read(read, &api.ReadOptions{ContentType:t})
+		body, err := api.Read(read, &api.ReadOptions{ContentType: t})
 		Done(body, err)
 		os.Exit(0)
 	}
 	// Update
-	if update!= ""{
+	if update != "" {
 		t, ok := contentType[ctype]
-		if !ok{
+		if !ok {
 			panic("Error Content-Type")
 		}
 		reader := bufio.NewReader(os.Stdin)
-		body, err := api.Update(read, ioutil.NopCloser(reader), &api.UpdateOptions{ContentType:t})
+		body, err := api.Update(read, ioutil.NopCloser(reader), &api.UpdateOptions{ContentType: t})
+		Done(body, err)
+		os.Exit(0)
+	}
+
+	// Patch
+	if patch != "" {
+		t, ok := contentType[ctype]
+		if !ok {
+			panic("Error Content-Type")
+		}
+		reader := bufio.NewReader(os.Stdin)
+		body, err := api.Patch(read, ioutil.NopCloser(reader), &api.PatchOptions{ContentType: t})
 		Done(body, err)
 		os.Exit(0)
 	}
 
 	// create
-	if create!= ""{
+	if create != "" {
 		t, ok := contentType[ctype]
-		if !ok{
+		if !ok {
 			panic("Error Content-Type")
 		}
 		reader := bufio.NewReader(os.Stdin)
 		body, err := api.Create(create, ioutil.NopCloser(reader), &api.CreateOptions{
-			ContentType:t,
+			ContentType: t,
 		})
 		Done(body, err)
 		os.Exit(0)
 	}
 
 	// delete
-	if delete!= ""{
+	if delete != "" {
 		t, ok := contentType[ctype]
-		if !ok{
+		if !ok {
 			panic("Error Content-Type")
 		}
 		body, err := api.Delete(create, &api.DeleteOptions{
-			ContentType:t,
+			ContentType: t,
 		})
 		Done(body, err)
 		os.Exit(0)
@@ -122,13 +139,13 @@ func main(){
 
 }
 
-func Done(body io.ReadCloser, err error){
-	if err != nil{
+// Done Done
+func Done(body io.ReadCloser, err error) {
+	if err != nil {
 		panic(err)
 	}
 	defer body.Close()
-	if _, err := io.Copy(os.Stdout, body); err!= nil{
+	if _, err := io.Copy(os.Stdout, body); err != nil {
 		panic(err)
 	}
 }
-

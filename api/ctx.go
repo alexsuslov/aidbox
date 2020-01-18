@@ -1,4 +1,4 @@
-package app
+package api
 
 type CTX struct {
 }

@@ -3,17 +3,20 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/alexsuslov/aidbox/api"
 	. "github.com/logrusorgru/aurora"
 )
 
-func helper(help string){
-	switch help{
-
+func helper(help string) {
+	switch help {
+	case "patch":
+		fmt.Println(api.HelpPatchText)
 	case "read":
 		fmt.Printf("Aidbox %v \n----", version)
 		fmt.Printf(helpReadText, Green(exmRead), Green(exmVRead))
 	}
-	if help!=""{
+	if help != "" {
 		os.Exit(0)
 	}
 }
