@@ -1,28 +1,62 @@
 package api
 
 import (
-	"github.com/alexsuslov/godotenv"
+	"io"
 	"log"
+	"os"
 )
 
-var(
+var (
+	// DEBUGGING DEBUGGING
 	DEBUGGING bool
-	_InsecureSkipVerify bool
-	_host string
-	_client string
-	_secret string
+	// _InsecureSkipVerify bool
+	// _host               string
+	// _client             string
+	// _secret             string
 )
 
-func Init()error{
-	_host = godotenv.GetPanic("AIDBOX_HOST")
-	_client = godotenv.GetPanic("AIDBOX_CLIENT")
-	_secret = godotenv.GetPanic("AIDBOX_SECRET")
-	_InsecureSkipVerify = godotenv.GetPanic("AIDBOX_INSECURE")=="YES"
-	return nil
+// Client Client
+type Client struct {
+	host               string
+	client             string
+	secret             string
+	insecureSkipVerify bool
 }
 
+// New New
+func New(host string, client1 string, secret string, insecureSkipVerify bool) (client *Client, err error) {
+	client = &Client{
+		host:               host,
+		client:             client1,
+		secret:             secret,
+		insecureSkipVerify: insecureSkipVerify,
+	}
+	// TODO: check health aidbox
+	return
+}
+
+// Print Print
 func Print(opts ...interface{}) {
 	if DEBUGGING {
 		log.Println(opts...)
+	}
+}
+
+var contentType = map[string]string{
+	"json": "application/json",
+	"xml":  "text/xml",
+	"yml":  "text/yaml",
+	"yaml": "text/yaml",
+}
+
+// Done Done
+func Done(body io.ReadCloser, err error) {
+	if err != nil {
+		panic(err)
+	}
+	defer body.Close()
+	if _, err := io.Copy(os.Stdout, body); err != nil {
+		panic(err)
+
 	}
 }

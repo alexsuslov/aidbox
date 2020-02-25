@@ -6,21 +6,24 @@ import (
 	"net/url"
 )
 
+// DeleteOptions DeleteOptions
 type DeleteOptions struct {
 	ContentType string
 }
 
-func NewDeleteOptions() *DeleteOptions{
+// NewDeleteOptions NewDeleteOptions
+func (Client Client) NewDeleteOptions() *DeleteOptions {
 	return &DeleteOptions{
 		ContentType: "application/json",
 	}
 }
 
-func Delete(resource string, options *DeleteOptions)(body io.ReadCloser, err error) {
-	Url := fmt.Sprintf("%v/%v", _host, resource)
-	u, err := url.Parse(Url)
-	if err!= nil{
+// Delete Delete
+func (Client Client) Delete(resource string, options *DeleteOptions) (body io.ReadCloser, err error) {
+	URL := fmt.Sprintf("%v/%v", Client.host, resource)
+	u, err := url.Parse(URL)
+	if err != nil {
 		return
 	}
-	return  Request("DELETE", u, nil, options.ContentType)
+	return Client.Request("DELETE", u, nil, options.ContentType)
 }

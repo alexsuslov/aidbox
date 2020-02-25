@@ -14,6 +14,7 @@ import (
 
 var version string
 var ver *bool
+var entity *bool
 var help string
 var debugger bool
 
@@ -56,6 +57,8 @@ func init() {
 	// content type
 	flag.StringVar(&ctype, "ctype", "json", "Content Type json| xml| yml ")
 
+	entity = flag.Bool("entity", false, "get list primitive")
+
 	ver = flag.Bool("version", false, "Print current version")
 
 	flag.Parse()
@@ -63,52 +66,30 @@ func init() {
 
 func main() {
 	if err := godotenv.Load(config); err != nil {
-		panic(err)
+		fmt.Printf("Warrning no .env file. %v", err)
 	}
 	if *ver {
 		fmt.Println(version)
 		os.Exit(0)
 	}
-
-	if err := api.Init(); err != nil {
+	client, err := api.New(
+		godotenv.GetPanic("AIDBOX_HOST"),
+		godotenv.GetPanic("AIDBOX_CLIENT"),
+		godotenv.GetPanic("AIDBOX_SECRET"),
+		godotenv.GetPanic("AIDBOX_INSECURE") == "YES",
+	)
+	if err != nil {
 		panic(fmt.Errorf("Init:%v", err))
 	}
 
 	api.DEBUGGING = debugger
 	helper(help)
-	// read
-	if read != "" {
-		t, ok := contentType[ctype]
-		if !ok {
-			panic("Error Content-Type")
-		}
-		body, err := api.Read(read, &api.ReadOptions{ContentType: t})
-		Done(body, err)
-		os.Exit(0)
-	}
+	// Read
+	client.MainRead(ctype, read)
 	// Update
-	if update != "" {
-		t, ok := contentType[ctype]
-		if !ok {
-			panic("Error Content-Type")
-		}
-		reader := bufio.NewReader(os.Stdin)
-		body, err := api.Update(read, ioutil.NopCloser(reader), &api.UpdateOptions{ContentType: t})
-		Done(body, err)
-		os.Exit(0)
-	}
-
+	client.MainUpdate(ctype, update)
 	// Patch
-	if patch != "" {
-		t, ok := contentType[ctype]
-		if !ok {
-			panic("Error Content-Type")
-		}
-		reader := bufio.NewReader(os.Stdin)
-		body, err := api.Patch(read, ioutil.NopCloser(reader), &api.PatchOptions{ContentType: t})
-		Done(body, err)
-		os.Exit(0)
-	}
+	client.MainPatch(ctype, patch)
 
 	// create
 	if create != "" {
@@ -117,7 +98,7 @@ func main() {
 			panic("Error Content-Type")
 		}
 		reader := bufio.NewReader(os.Stdin)
-		body, err := api.Create(create, ioutil.NopCloser(reader), &api.CreateOptions{
+		body, err := client.Create(create, ioutil.NopCloser(reader), &api.CreateOptions{
 			ContentType: t,
 		})
 		Done(body, err)
@@ -130,12 +111,14 @@ func main() {
 		if !ok {
 			panic("Error Content-Type")
 		}
-		body, err := api.Delete(create, &api.DeleteOptions{
+		body, err := client.Delete(create, &api.DeleteOptions{
 			ContentType: t,
 		})
 		Done(body, err)
 		os.Exit(0)
 	}
+
+	client.MainEntity(*entity, ctype, ioutil.NopCloser(bufio.NewReader(os.Stdin)))
 
 }
 

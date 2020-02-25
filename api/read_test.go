@@ -1,18 +1,25 @@
 package api_test
 
 import (
-	"github.com/alexsuslov/aidbox/api"
-	"github.com/alexsuslov/godotenv"
 	"io/ioutil"
 	"log"
 	"testing"
+
+	"github.com/alexsuslov/aidbox/api"
+	"github.com/alexsuslov/godotenv"
 )
 
 func TestRead(t *testing.T) {
-	if err := godotenv.Load("../.env"); err!= nil{
+	if err := godotenv.Load("../.env"); err != nil {
 		panic(err)
 	}
-	if err := api.Init(); err!= nil{
+	client, err := api.New(
+		godotenv.GetPanic("AIDBOX_HOST"),
+		godotenv.GetPanic("AIDBOX_CLIENT"),
+		godotenv.GetPanic("AIDBOX_SECRET"),
+		godotenv.GetPanic("AIDBOX_INSECURE") == "YES",
+	)
+	if err != nil {
 		panic(err)
 	}
 	type args struct {
@@ -20,9 +27,9 @@ func TestRead(t *testing.T) {
 		options  *api.ReadOptions
 	}
 	tests := []struct {
-		name     string
-		args     args
-		wantErr  bool
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			"read Patient/0b72a6dd-5f83-4bb9-9aac-27a7786e2536",
@@ -47,15 +54,15 @@ func TestRead(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			api.DEBUGGING=true
-			gotBody, err := api.Read(tt.args.resource, tt.args.options)
+			api.DEBUGGING = true
+			gotBody, err := client.Read(tt.args.resource, tt.args.options)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if gotBody!= nil{
+			if gotBody != nil {
 				data, err := ioutil.ReadAll(gotBody)
-				if err!= nil{
+				if err != nil {
 					panic(err)
 				}
 				log.Println(string(data))

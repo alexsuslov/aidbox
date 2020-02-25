@@ -14,24 +14,24 @@ import (
 )
 
 // Request Request
-func Request(method string, url *url.URL, reader io.ReadCloser, contentType string) (body io.ReadCloser, err error) {
+func (Client Client) Request(method string, url *url.URL, reader io.ReadCloser, contentType string) (body io.ReadCloser, err error) {
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: _InsecureSkipVerify},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: Client.insecureSkipVerify},
 	}
-	Url := url.String()
+	URL := url.String()
 	Print("method", method)
-	Print("url", Url)
+	Print("url", URL)
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	req, err := http.NewRequestWithContext(ctx, method, Url, reader)
-	if err!= nil{
+	req, err := http.NewRequestWithContext(ctx, method, URL, reader)
+	if err != nil {
 		return
 	}
 	basic := base64.StdEncoding.EncodeToString(
 		[]byte(
-			fmt.Sprintf("%v:%v", _client, _secret),
-			),
-		)
+			fmt.Sprintf("%v:%v", Client.client, Client.secret),
+		),
+	)
 	Print("Basic", basic)
 	authorization := fmt.Sprintf("Basic %v", basic)
 	Print("Authorization", basic)

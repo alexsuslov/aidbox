@@ -6,21 +6,24 @@ import (
 	"net/url"
 )
 
+// CreateOptions CreateOptions
 type CreateOptions struct {
 	ContentType string
 }
 
-func NewCreateOptions() *CreateOptions{
+// NewCreateOptions NewCreateOptions
+func NewCreateOptions() *CreateOptions {
 	return &CreateOptions{
 		ContentType: "application/json",
 	}
 }
 
-func Create(resource string, Req io.ReadCloser, options *CreateOptions, )(body io.ReadCloser, err error) {
-	Url := fmt.Sprintf("%v/%v", _host, resource)
-	u, err := url.Parse(Url)
-	if err!= nil{
+// Create Create
+func (Client Client) Create(resource string, Req io.ReadCloser, options *CreateOptions) (body io.ReadCloser, err error) {
+	URL := fmt.Sprintf("%v/%v", Client.host, resource)
+	u, err := url.Parse(URL)
+	if err != nil {
 		return
 	}
-	return  Request("POST", u, Req, options.ContentType)
+	return Client.Request("POST", u, Req, options.ContentType)
 }
